@@ -11,7 +11,7 @@ const config = req("../server-config.js");
 
 req('es6-promise').polyfill();
 
-
+const extend = req('extend');
 const bs = req("browser-sync").create();
 
 
@@ -28,7 +28,7 @@ const style = config.style;
 const sassIncludes = config.sassIncludes;
 
 
-const bsConfig = {
+const bsConfig = extend(true,{
     //chokidar options
     watchOptions: {
 	awaitWriteFinish: {
@@ -36,16 +36,15 @@ const bsConfig = {
 	    pollInterval: 100
 	}
     },
-    proxy: config.BS.proxy,
     injectChanges: true,
-    online:false,
+    online:true,
     ui:false,
     open: "local",
+    external: "true",
     logLevel: "debug",
     reloadOnRestart: false,
-    ghostMode: false,
-    files: config.BS.watch
-};
+    ghostMode: false
+},config.BS);
 //
 const sassConfig = {
     file: style.in,
