@@ -1,0 +1,12 @@
+*~
+*#
+.#*
+.DS_Store
+.tern-port
+.dir-locals.el
+node_modules
+dist
+done.txt
+todo.txt
+report.txt
+composer.lock

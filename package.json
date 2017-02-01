@@ -1,0 +1,33 @@
+{
+  "name": "dev-server",
+  "version": "0.6.0",
+  "description": "BrowserSync + node-sass + postcss = webdev-proxy-server",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paxperscientiam/webdev-proxy-server.git"
+  },
+  "author": "Chris <chrisdavidramos@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/paxperscientiam/webdev-proxy-server/issues"
+  },
+  "homepage": "https://github.com/paxperscientiam/webdev-proxy-server#readme",
+  "devDependencies": {
+    "autoprefixer": "^6.7.2",
+    "browser-sync": "^2.18.7",
+    "commander": "^2.9.0",
+    "cssnano": "^3.10.0",
+    "es6-promise": "^4.0.5",
+    "extend": "^3.0.0",
+    "node-sass": "^4.5.0",
+    "postcss": "^5.2.11",
+    "postcss-flexboxfixer": "^0.0.5",
+    "postcss-unprefix": "^1.1.0",
+    "terminal-kit": "^0.26.1"
+  }
+}
