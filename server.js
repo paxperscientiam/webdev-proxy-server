@@ -9,19 +9,59 @@ const fs = require('fs');
 const config = req("../server-config.js");
 
 
-req('es6-promise').polyfill();
+require('es6-promise').polyfill();
 
-const extend = req('extend');
-const bs = req("browser-sync").create();
+const extend = require('extend');
+const bs = require("browser-sync").create();
+
+const program = require('commander');
+
+// process command line arguments
+program
+    .version('0.6')
+    .option('-t, --tunnel', 'Make America Online Again!')
+    .option('-o, --online', 'Make available over network.')
+    .option('-l, --local', "Run only on this machine.",{isDefault:true,noHelp:true})
+    .parse(process.argv);
 
 
-const postcss = req('postcss'),
-      prefixer = req('autoprefixer'),
-      cssnano = req('cssnano'),
-      unprefixer = req('postcss-unprefix'),
-      sass = req("node-sass"),
-      term = req( 'terminal-kit' ).terminal
+var network = {};
+network.online = false;
+network.tunnel = false;
+network.open = "local";
+
+
+if (program.tunnel) {
+    network.tunnel = true;
+    network.online = true;
+    network.open = "tunnel";
+} else if (program.online) {
+    network.online = true;
+    network.open = "external";
+} else {
+    network.open = "local";
+}
+
+
+program.on('--help', function(){
+    console.log('Example help dialog.');
+});
+
+
+if (network.tunnel) console.log("User wants some internet!");
+
+
+const postcss = require('postcss'),
+      prefixer = require('autoprefixer'),
+      // rewrite code with existing vendor prefixes for flexbox
+      flexboxfixer = require('postcss-flexboxfixer'),
+      cssnano = require('cssnano'),
+      unprefixer = require('postcss-unprefix'),
+      sass = require("node-sass"),
+      term = require( 'terminal-kit' ).terminal
 ;
+
+
 // in:main.scss => out:main.css
 const style = config.style;
 
@@ -37,10 +77,10 @@ const bsConfig = extend(true,{
 	}
     },
     injectChanges: true,
-    online:true,
+    tunnel: network.tunnel,
+    online: network.online,
     ui:false,
-    open: "local",
-    external: "true",
+    open: network.open,
     logLevel: "debug",
     reloadOnRestart: false,
     ghostMode: false
@@ -53,7 +93,14 @@ const sassConfig = {
 //
 const post = {
     "autoprefixer": {
-	"browsers": ">5%"
+	"browsers": [
+	    // Major including ios
+	    "> 1%",
+	    "last 3 versions",
+	    'Android >= 2.3',
+	    'ie >= 9',
+	    'ios >= 7'
+	]
     },
     "cssnano": {
 	"calc":true,
@@ -66,12 +113,12 @@ const post = {
 	"discardOverridden":true,
 	"normalizeCharset": true,
 	"mergeLonghand": true,
-	"mergeRules":true,
+	"mergeRules": true,
 	"minifyFontValues":true,
-	"minifyParams":true,
-	"orderedValues":true,
-	"uniqueSelectors":true,
-	"safe":true
+	"minifyParams": true,
+	"orderedValues": true,
+	"uniqueSelectors": true,
+	"safe": true
     }
 };
 
@@ -80,8 +127,8 @@ const post = {
 // Listen for the `init` event
 bs.emitter
     .on("init", function () {
-	term.red("Server initiated.\n");
-	//buildCSS();
+	term.green("Server initiated.\n\n");
+	term.green(sass.info + "\n\n");
     });
 
 
@@ -103,6 +150,7 @@ function buildCSS() {
 	if(!err){
 	    postcss([
 		unprefixer,
+		flexboxfixer,
 		prefixer(post.autoprefixer),
 		cssnano(post.cssnano)
 	    ])
@@ -112,10 +160,23 @@ function buildCSS() {
 		    fs.writeFileSync(style.out,result.css);
 		});
 	} else {
-	    term.red.error(err.message+'\n');
+	    term.red.error(err.message+ 'on line '+ err.line+ '\n');
 	}
     });
 }
+
+
+setInterval(function () {
+
+    term.blue("[")
+	.red(process.pid)
+	.blue("]")
+	.green(" Process has been running for ")
+	.red(process.uptime() + " seconds.\n\n");
+//
+},10000);
+
+
 
 function req(module) {
     return require(path.join(process.cwd(),"/node_modules/",module));
