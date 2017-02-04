@@ -52,15 +52,22 @@ if (network.tunnel) console.log("User wants some internet!");
 
 
 const postcss = require('postcss'),
+      // postcss-fixes covers pixrem, calc fix, flexbug-fiex, pseudoelements fix, switch to old opacity, nth--child fix for android, vmin fix for ie9
+      cssfixer = require('postcss-fixes'),
       prefixer = require('autoprefixer'),
+      flexbugfixer = require('postcss-flexbugs-fixes'),
       // rewrite code with existing vendor prefixes for flexbox
       flexboxfixer = require('postcss-flexboxfixer'),
       cssnano = require('cssnano'),
       unprefixer = require('postcss-unprefix'),
       sass = require("node-sass"),
-      term = require( 'terminal-kit' ).terminal
+      term = require( 'terminal-kit' ).terminal,
+      pkgjson = require('root-require')('package.json'),
+      flexibility = require('postcss-flexibility')
 ;
 
+
+const browserslist = pkgjson.browserslist;
 
 // in:main.scss => out:main.css
 const style = config.style;
@@ -91,19 +98,14 @@ const sassConfig = {
     includePaths: sassIncludes
 };
 //
+
+
 const post = {
-    "autoprefixer": {
-	"browsers": [
-	    // Major including ios
-	    "> 1%",
-	    "last 3 versions",
-	    'Android >= 2.3',
-	    'ie >= 9',
-	    'ios >= 7'
-	]
-    },
     "cssnano": {
-	"calc":true,
+	"autoprefixer": {
+	    add: true
+	},
+	"calc":false, // false cuz rendundant when using postcss-fixes
 	"colormin":true,
 	"discardComments": {
 	    "removeAll": true
@@ -118,6 +120,7 @@ const post = {
 	"minifyParams": true,
 	"orderedValues": true,
 	"uniqueSelectors": true,
+	// safe mode highly recommended
 	"safe": true
     }
 };
@@ -129,6 +132,7 @@ bs.emitter
     .on("init", function () {
 	term.green("Server initiated.\n\n");
 	term.green(sass.info + "\n\n");
+	buildCSS();
     });
 
 
@@ -142,17 +146,25 @@ bs.watch("./scss/*.scss", function (event, file) {
 // let's do this
 bs.init(bsConfig);
 //
-//
+
 //
 function buildCSS() {
     sass.render(sassConfig, function(err,result) {
 	//
 	if(!err){
 	    postcss([
+		// (1) unprefix the css
 		unprefixer,
+		// (2) adds missing NON-prefixed attributes and values
 		flexboxfixer,
-		prefixer(post.autoprefixer),
-		cssnano(post.cssnano)
+		// see coverage above
+		cssfixer,
+		// (3) compress your CSS mucho, which includes autoprefixer
+		cssnano(post.cssnano),
+		//
+		flexbugfixer,
+		//
+		flexibility
 	    ])
 		.process(result.css.toString())
 		.then(function (result) {
@@ -173,8 +185,8 @@ setInterval(function () {
 	.blue("]")
 	.green(" Process has been running for ")
 	.red(process.uptime() + " seconds.\n\n");
-//
-},10000);
+    //
+},20000);
 
 
 

@@ -26,8 +26,20 @@
     "extend": "^3.0.0",
     "node-sass": "^4.5.0",
     "postcss": "^5.2.11",
+    "postcss-fixes": "^1.4.2",
     "postcss-flexboxfixer": "^0.0.5",
+    "postcss-flexbugs-fixes": "^2.1.0",
+    "postcss-flexibility": "^1.1.0",
     "postcss-unprefix": "^1.1.0",
+    "root-require": "^0.3.1",
     "terminal-kit": "^0.26.1"
-  }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 3 versions",
+    "Safari >= 8",
+    "Android >= 2.3",
+    "ie >= 9",
+    "ios >= 7"
+  ]
 }
