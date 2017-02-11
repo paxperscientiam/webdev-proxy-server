@@ -52,7 +52,7 @@ if (network.tunnel) console.log("User wants some internet!");
 
 
 const postcss = require('postcss'),
-      // postcss-fixes covers pixrem, calc fix, flexbug-fiex, pseudoelements fix, switch to old opacity, nth--child fix for android, vmin fix for ie9
+      // postcss-fixes covers pixrem, calc fix, flexbug-fix, pseudoelements fix, switch to old opacity, nth--child fix for android, vmin fix for ie9
       cssfixer = require('postcss-fixes'),
       prefixer = require('autoprefixer'),
       flexbugfixer = require('postcss-flexbugs-fixes'),
@@ -102,9 +102,6 @@ const sassConfig = {
 
 const post = {
     "cssnano": {
-	"autoprefixer": {
-	    add: true
-	},
 	"calc":false, // false cuz rendundant when using postcss-fixes
 	"colormin":true,
 	"discardComments": {
@@ -160,11 +157,10 @@ function buildCSS() {
 		// see coverage above
 		cssfixer,
 		// (3) compress your CSS mucho, which includes autoprefixer
-		cssnano(post.cssnano),
+		prefixer(browserslist),
+		cssnano(post.cssnano)
 		//
-		flexbugfixer,
 		//
-		flexibility
 	    ])
 		.process(result.css.toString())
 		.then(function (result) {
