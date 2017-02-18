@@ -1,0 +1,8 @@
+#!/opt/local/bin/bash
+#
+fig () {
+
+  command figlet -f "${1}" "${2}" | command sed -e 's/^/\/\//'
+
+}
+fig "$@"

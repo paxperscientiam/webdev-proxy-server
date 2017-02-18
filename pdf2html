@@ -1,0 +1,20 @@
+#!/opt/local/bin/bash
+
+convert () {
+  inputPDF="${1}"
+  externalDir="${inputPDF%.*}"
+
+  pdf2htmlEX --debug=0 \
+	     --no-drm=1 \
+	     --fit-width=1200 \
+	     --printing=0 \
+	     --split-pages=1 \
+	     --page-filename='webbook-%03d.php' \
+	     --embed CFIJO \
+	     --auto-hint=1 \
+	     --external-hint-tool=ttfautohint \
+	     --dest-dir "${externalDir}/" \
+	     "${inputPDF}"
+}
+
+convert "$@"
